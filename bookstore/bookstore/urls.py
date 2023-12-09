@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from books.api.views import LibroBusquedaView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/libros/', LibroBusquedaView.as_view())
 ]

@@ -4,7 +4,7 @@ from rest_framework import status
 from books.models import Libro
 from books.api.serializers import LibroSerializer
 
-class LibroBusquedaView(APIView):
+class LibrosView(APIView):
     def get(self, request, *args, **kwargs):
         title = request.query_params.get('titulo')
         subtitle = request.query_params.get('subtitulo')
@@ -36,3 +36,14 @@ class LibroBusquedaView(APIView):
 
         serializer = LibroSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+        
+
+class LibroByIdView(APIView):
+    def delete(self, request, libro_id, *args, **kwargs):
+        try:
+            book = Libro.objects.get(pk=libro_id)
+            book.delete()
+            return Response(status=status.HTTP_200_OK, data="El libro con id: " + str(libro_id) + " se eliminó correctamente!")
+        except Libro.DoesNotExist:
+            return Response({"error": "Libro no existe"}, status=status.HTTP_404_NOT_FOUND)

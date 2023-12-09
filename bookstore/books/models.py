@@ -1,18 +1,6 @@
 from django.db import models
-
-class Autor(models.Model):
-    id = models.SmallAutoField(primary_key=True)
-    nombre = models.CharField(max_length=255)
-    apellido = models.CharField(max_length=255)
-    class Meta:
-        db_table = "autores"
-
-
-class Categoria(models.Model):
-    id = models.SmallAutoField(primary_key=True)
-    nombre_categoria = models.CharField(max_length=255)
-    class Meta:
-        db_table = "categorias"
+from authors.models import Autor
+from categories.models import Categoria
 
 
 class Libro(models.Model):

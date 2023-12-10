@@ -10,9 +10,9 @@ class Libro(models.Model):
     fecha_publicacion = models.DateField()
     editor = models.CharField(max_length=255)
     descripcion = models.TextField()
-    imagen = models.CharField(max_length=255, null=True)
+    imagen = models.TextField(null=True)
     fuente = models.CharField(max_length=255)
     google_id = models.CharField(max_length=255, null=True)
-    
+
     class Meta:
         db_table = "libros"

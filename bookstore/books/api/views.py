@@ -7,7 +7,7 @@ from books.api.serializers import LibroSerializer
 from decouple import config
 
 class LibrosView(APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         title = request.query_params.get('titulo')
         subtitle = request.query_params.get('subtitulo')
         author = request.query_params.get('autor')
@@ -16,7 +16,6 @@ class LibrosView(APIView):
         editor = request.query_params.get('editor')
         description = request.query_params.get('descripcion')
         source = request.query_params.get('fuente')
-
 
         queryset = Libro.objects.all()
         if title:
@@ -61,7 +60,6 @@ class LibrosView(APIView):
         params['inpublisher'] = filters.get('editor', '')
         params['subject'] = filters.get('categoria', '')
 
-
         response = requests.get(google_books_api_url, params=params, headers={'key': api_key})
         response_data = response.json()
 
@@ -83,14 +81,52 @@ class LibrosView(APIView):
             books.append(book_data)
 
         return books
-    
-        
 
 class LibroPorIdView(APIView):
-    def delete(self, request, libro_id, *args, **kwargs):
+    def delete(self, request, libro_id):
         try:
             book = Libro.objects.get(pk=libro_id)
             book.delete()
-            return Response(status=status.HTTP_200_OK, data="El libro con id: " + str(libro_id) + " se eliminó correctamente!")
+            return Response(status=status.HTTP_200_OK, data={"Mensaje": "El libro con id: " + str(libro_id) + " se eliminó correctamente!"})
         except Libro.DoesNotExist:
-            return Response({"error": "Libro no existe"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"error": "Libro no existe"}, status=status.HTTP_404_NOT_FOUND)
+
+class LibroPorGoogleIdView(APIView):
+
+    def post(self, request, google_id):
+        book = Libro.objects.filter(google_id=google_id).first()
+        if book is not None:
+            return Response(data={"error": "Libro ya se encuentra registrado con ese id de google"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        book = self.llamar_google_api_por_id(google_id)
+        if book is None:
+            return Response(data={"error": "Id de google inválido"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        Libro.objects.create(**book)
+        return Response(status=status.HTTP_201_CREATED, data={"Mensaje": "El libro con id de google: " + google_id + " se agregó correctamente!"})
+    
+    def llamar_google_api_por_id(self, id):
+        google_books_api_url = "https://www.googleapis.com/books/v1/volumes/" + id
+        api_key = config('GOOGLE_API_KEY')
+
+        response = requests.get(google_books_api_url, headers={'key': api_key})
+        response_data = response.json()
+
+        if response_data == {}:
+            return None
+
+        volume_info = response_data.get('volumeInfo', {})
+        book_data = {
+            'titulo': volume_info.get('title', ''),
+            'subtitulo': volume_info.get('subtitle', ''),
+            'autores': ",".join(volume_info.get('authors', [])),
+            'categorias': ",".join(volume_info.get('categories', [])),
+            'fecha_publicacion': volume_info.get('publishedDate', ''),
+            'editor': volume_info.get('publisher', ''),
+            'descripcion': volume_info.get('description', ''),
+            'imagen': volume_info.get('imageLinks', {}).get('thumbnail', ''),
+            'fuente': "google",
+            'google_id': response_data.get('id', '')
+        }
+        print(book_data)
+        return book_data

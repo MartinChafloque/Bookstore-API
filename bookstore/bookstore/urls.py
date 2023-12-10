@@ -17,9 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from books.api.views import LibrosView
 from books.api.views import LibroPorIdView
+from books.api.views import LibroPorGoogleIdView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/libros/', LibrosView.as_view()),
     path('api/v1/libros/<int:libro_id>', LibroPorIdView.as_view()),
+    path('api/v1/libros/<str:google_id>', LibroPorGoogleIdView.as_view()),
 ]

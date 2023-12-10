@@ -7,6 +7,8 @@ name = "pypi"
 django = "==3.2.3"
 djangorestframework = "==3.12.4"
 mysqlclient = "*"
+python-decouple = "*"
+requests = "*"
 
 [dev-packages]
 

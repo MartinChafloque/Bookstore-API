@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from books.api.views import LibrosView
-from books.api.views import LibroByIdView
+from books.api.views import LibroPorIdView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/libros/', LibrosView.as_view()),
-    path('api/v1/libros/<int:libro_id>', LibroByIdView.as_view()),
+    path('api/v1/libros/<int:libro_id>', LibroPorIdView.as_view()),
 ]

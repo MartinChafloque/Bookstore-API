@@ -87,7 +87,7 @@ class LibroPorIdView(APIView):
         try:
             book = Libro.objects.get(pk=libro_id)
             book.delete()
-            return Response(status=status.HTTP_200_OK, data={"Mensaje": "El libro con id: " + str(libro_id) + " se eliminó correctamente!"})
+            return Response(status=status.HTTP_200_OK, data={"mensaje": "El libro con id: " + str(libro_id) + " se eliminó correctamente!"})
         except Libro.DoesNotExist:
             return Response(data={"error": "Libro no existe"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -98,11 +98,12 @@ class LibroPorGoogleIdView(APIView):
             return Response(data={"error": "Libro ya se encuentra registrado con ese id de google"}, status=status.HTTP_400_BAD_REQUEST)
         
         book = self.llamar_google_api_por_id(google_id)
+
         if book is None:
             return Response(data={"error": "Id de google inválido"}, status=status.HTTP_400_BAD_REQUEST)
         
         Libro.objects.create(**book)
-        return Response(status=status.HTTP_201_CREATED, data={"Mensaje": "El libro con id de google: " + google_id + " se agregó correctamente!"})
+        return Response(status=status.HTTP_201_CREATED, data={"mensaje": "El libro con id de google: " + google_id + " se agregó correctamente!"})
     
     def llamar_google_api_por_id(self, id):
         google_books_api_url = "https://www.googleapis.com/books/v1/volumes/" + id
@@ -110,8 +111,7 @@ class LibroPorGoogleIdView(APIView):
 
         response = requests.get(google_books_api_url, headers={'key': api_key})
         response_data = response.json()
-
-        if response_data == {}:
+        if "error" in response_data:
             return None
 
         volume_info = response_data.get('volumeInfo', {})
@@ -127,7 +127,6 @@ class LibroPorGoogleIdView(APIView):
             'fuente': "google",
             'google_id': response_data.get('id', '')
         }
-        print(book_data)
         return book_data
 
 class LibroExternalApiView(APIView):
@@ -143,6 +142,9 @@ class LibroExternalApiView(APIView):
         description = request.query_params.get('descripcion')
         params = {}
         
+        if title is None and subtitle is None and author is None and category is None and publishing_date is None and editor is None and description is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Es necesario al menos uno de los siguientes parametros: titulo, subitulo, autor, categoria, fecha_publicacion, editor, descripcion"})
+
         if title:
             params["q"] = title
         elif subtitle:

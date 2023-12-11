@@ -25,4 +25,6 @@ ENDPOINTS
 
 - `api/v1/libros/<str:google_id>`: Método POST. Registra un libro en la base de datos con información recuperada de la API de google. Este endpoint hace uso de un path parameter llamado `google_id` que hace referencia al key principal de la API de google que puede ser recuperada con el anterior endpoint en el campo `google_id`.
 
-- `api/v1/libros/external/`: Método GET. Busqueda de los libros en la api Open Library con el fin de ver libros organizados por su rating. Este endpoint hace uso de query parameters para filtrar resultados, estos son: `titulo`, `subtitulo`, `autor`, `categoria`, `fecha_publicacion (el formato debe seguir YYYY)`, `editor`.
+- `api/v1/libros/external/`: Método GET. Busqueda de los libros en la API Open Library con el fin de ver libros organizados por su rating. Este endpoint hace uso de query parameters para filtrar resultados, estos son: `titulo`, `subtitulo`, `autor`, `categoria`, `fecha_publicacion (el formato debe seguir YYYY)`, `editor`.
+
+NOTA: Dentro de este repositorio se encuentra el archivo `.env.overrides` que contiene todas las keys necesarias para el funcionamiento de la API. Copiarlas en un archivo `.env` y llenar las llaves con sus respectivos valores.

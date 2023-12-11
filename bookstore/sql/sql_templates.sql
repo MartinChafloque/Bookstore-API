@@ -1,3 +1,3 @@
-INSERT INTO libros (titulo, subtitulo, autores, categorias, fecha_publicacion, editor, descripcion, imagen) VALUES
-('Harry Potter', 'y la piedra filosofal', "J.K Rowling", "Fantasia", '1997-06-30', 'Bloomsbury', 'La primera aventura de Harry y sus amigos', 'https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg'),
-('El delfin', 'sobre el mar y el alma', '2000-01-02', 'Norma', 'El amor entre una pareja se ve complicado por un delfin', 'image2.jpg');
+INSERT INTO libros (titulo, subtitulo, autores, categorias, fecha_publicacion, editor, descripcion, imagen, fuente, google_id) VALUES
+('Harry Potter', 'y la piedra filosofal', "J.K Rowling", "Fantasia", '1997-06-30', 'Bloomsbury', 'La primera aventura de Harry y sus amigos', 'https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg', 'interna', null),
+('El delfin', 'sobre el mar y el alma', "Martin Chafloque,Juan Chafloque", "Drama,Romance", '2000-01-02', 'Norma', 'El amor entre una pareja se ve complicado por un delfin', 'image2.jpg', 'interna', null);

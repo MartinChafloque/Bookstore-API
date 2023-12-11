@@ -92,7 +92,6 @@ class LibroPorIdView(APIView):
             return Response(data={"error": "Libro no existe"}, status=status.HTTP_404_NOT_FOUND)
 
 class LibroPorGoogleIdView(APIView):
-
     def post(self, request, google_id):
         book = Libro.objects.filter(google_id=google_id).first()
         if book is not None:
@@ -130,3 +129,59 @@ class LibroPorGoogleIdView(APIView):
         }
         print(book_data)
         return book_data
+
+class LibroExternalApiView(APIView):
+    def get(self, request):
+        open_library_api_url = "https://openlibrary.org/search.json"
+
+        title = request.query_params.get('titulo')
+        subtitle = request.query_params.get('subtitulo')
+        author = request.query_params.get('autor')
+        category = request.query_params.get('categoria')
+        publishing_date = request.query_params.get('fecha_publicacion')
+        editor = request.query_params.get('editor')
+        description = request.query_params.get('descripcion')
+        params = {}
+        
+        if title:
+            params["q"] = title
+        elif subtitle:
+            params["q"] = subtitle
+        elif author:
+            params["q"] = author
+        elif category:
+            params["q"] = category
+        elif publishing_date:
+            params["q"] = publishing_date
+        elif editor:
+            params["q"] = editor
+        elif description:
+            params["q"] = description
+        
+        params['title'] = title
+        params['subtitle'] = subtitle
+        params['author_name'] = author
+        params['subject'] = category
+        params['publisher'] = editor
+        params['first_publish_year'] = publishing_date
+
+        response = requests.get(open_library_api_url, params=params)
+        response_data = response.json()
+        
+        external_books = []
+        for doc in response_data.get('docs', []):
+            if 'ratings_average' in doc and (doc.get('ratings_count') and float(doc['ratings_count']) > 50):
+                external_book = {
+                    'titulo': doc.get('title', ''),
+                    'autor': doc.get('author_name', []),
+                    'fecha_publicacion': doc.get('first_publish_year', ''),
+                    'categoria': doc.get('subject', []),  
+                    'editor': doc.get('publisher', [''])[0],
+                    'rating (1-5)': doc.get('ratings_average', ''),
+                    'numero de ratings': doc.get('ratings_count', '')
+                }
+                external_books.append(external_book)
+        
+        sorted_books = sorted(external_books, key=lambda x: float(x['rating (1-5)']), reverse=True)
+
+        return Response(status=status.HTTP_200_OK, data={"libros": sorted_books, "fuente": "externa"})
